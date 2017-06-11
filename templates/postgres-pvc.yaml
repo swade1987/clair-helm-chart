@@ -1,0 +1,22 @@
+{{- if and .Values.postgres.persistence.enabled (not .Values.postgres.persistence.existingClaim) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: postgres
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+  {{- if .Values.postgres.persistence.storageClass }}
+    volume.beta.kubernetes.io/storage-class: {{ .Values.postgres.persistence.storageClass | quote }}
+  {{- else }}
+    volume.alpha.kubernetes.io/storage-class: default
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.postgres.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.postgres.persistence.size | quote }}
+{{- end -}}

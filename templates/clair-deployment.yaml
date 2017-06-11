@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: {{ .Values.clair.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+      annotations:
+        # When config or secrets change checksum will change forcing redeployment
+        checksum/config: {{ include (print $.Template.BasePath "/clair-configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.clair.image.repository }}/{{ .Values.clair.image.name }}:{{ .Values.clair.image.tag }}"
+        imagePullPolicy: {{ .Values.clair.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.clair.ports.api }}
+        - containerPort: {{ .Values.clair.ports.health }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config
+        resources:
+{{ toYaml .Values.clair.resources | indent 10 }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Chart.Name }}

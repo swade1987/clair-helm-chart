@@ -1,0 +1,60 @@
+namespace: clair
+
+# #####################################
+# CLAIR VALUES
+# #####################################
+clair:
+  replicas: 1
+
+  image:
+    repository: quay.io
+    name: coreos/clair
+    tag: 'v2.0.0'
+    pullPolicy: IfNotPresent
+
+  ports:
+    api: 6060
+    health: 6061
+
+  resources:
+    limits:
+      memory: 300M
+
+# #####################################
+# POSTGRES VALUES
+# #####################################
+postgres:
+  replicas: 1
+  username: postgres
+  password: password
+
+  image:
+    repository: docker.io
+    name: postgres/postgres
+    tag: '9.6.2'
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 5432
+
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 100m
+
+  ## Persist data to a persitent volume
+  persistence:
+    enabled: true
+
+    ## A manually managed Persistent Volume and Claim
+    ## Requires persistence.enabled: true
+    ## If defined, PVC must be created manually before volume will be bound
+    # existingClaim:
+
+    ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
+    ## Default: volume.alpha.kubernetes.io/storage-class: default
+    ##
+    # storageClass:
+    accessMode: ReadWriteMany
+    size: 8Gi
+    subPath: "postgresql-db"
