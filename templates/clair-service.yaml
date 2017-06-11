@@ -6,9 +6,15 @@ metadata:
   labels:
     app: {{ .Chart.Name }}
 spec:
+  {{- if .Values.clair.nodePort.enabled }}
+  type: NodePort
+  {{- end }}
   ports:
   - port: {{ .Values.clair.ports.api }}
     protocol: TCP
+    {{- if .Values.clair.nodePort.enabled }}
+    nodePort: {{ Values.clair.nodePort.port }}
+    {{- end }}
     name: api
   - port: {{ .Values.clair.ports.health }}
     protocol: TCP

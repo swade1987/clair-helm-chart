@@ -20,6 +20,10 @@ clair:
     limits:
       memory: 300M
 
+  # nodePort:
+  #   enabled: true
+  #   port: 30060
+
 # #####################################
 # POSTGRES VALUES
 # #####################################
